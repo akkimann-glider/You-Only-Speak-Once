@@ -43,21 +43,53 @@ def login(username):
 
 @app.route('/register/<string:username>', methods=['POST'])
 def register(username):
-    filename = _save_file(request, username)
-    fbanks = extract_fbanks(filename)
-    embeddings = get_embeddings(fbanks)
-    print('shape of embeddings: {}'.format(embeddings.shape), flush=True)
-    mean_embeddings = np.mean(embeddings, axis=0)
-    np.save(DATA_DIR + username + '/embeddings.npy', mean_embeddings)
-    return Response('', mimetype='application/json')
+    print("HERE::", username)
+    leftName = "left_" + username
+    rightName = "right_" + username
+    filenameLeft = _save_file(request, leftName, "fileLeft")
+    print("filenameLeft", filenameLeft)
+    fbanksLeft = extract_fbanks(filenameLeft)
+    embeddingsLeft = get_embeddings(fbanksLeft)
+    mean_embeddingsLeft = np.mean(embeddingsLeft, axis=0)
+    np.save(DATA_DIR + leftName + '/embeddings.npy', mean_embeddingsLeft)
+    stored_embeddings = np.load(DATA_DIR + leftName + '/embeddings.npy')
+    stored_embeddings = stored_embeddings.reshape((1, -1))
+
+    filenameRight = _save_file(request, rightName, "fileRight")
+    print("fbanksRight", filenameRight)
+    fbanksRight = extract_fbanks(filenameRight)
+    embeddingsRight = get_embeddings(fbanksRight)
 
 
-def _save_file(request_, username):
-    file = request_.files['file']
-    dir_ = DATA_DIR + username
-    if not os.path.exists(dir_):
-        os.makedirs(dir_)
+    distances = get_cosine_distance(embeddingsRight, stored_embeddings)
+    print('mean distances', np.mean(distances), flush=True)
+    positives = distances < THRESHOLD
+    positives_mean = np.mean(positives)
+    print('positives mean: {}'.format(positives_mean), flush=True)
+    
+    return Response(str(positives_mean), mimetype='application/json')
 
-    filename = DATA_DIR + username + '/sample.wav'
-    file.save(filename)
-    return filename
+
+# @app.route('/register/<string:username>', methods=['POST'])
+# def register(username):
+#     filename = _save_file(request, username)
+#     fbanks = extract_fbanks(filename)
+#     embeddings = get_embeddings(fbanks)
+#     print('shape of embeddings: {}'.format(embeddings.shape), flush=True)
+#     mean_embeddings = np.mean(embeddings, axis=0)
+#     np.save(DATA_DIR + username + '/embeddings.npy', mean_embeddings)
+#     return Response('', mimetype='application/json')
+
+
+def _save_file(request_, username, fileNameInData):
+    try:
+        file = request_.files[fileNameInData]
+        dir_ = DATA_DIR + username
+        if not os.path.exists(dir_):
+            os.makedirs(dir_)
+
+        filename = DATA_DIR + username + '/sample.wav'
+        file.save(filename)
+        return filename
+    except:
+        print("An exception occurred")
