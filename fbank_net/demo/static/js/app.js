@@ -288,7 +288,7 @@ submit.addEventListener("click", function (event) {
         if (this.readyState === 4) {
             console.log("Server returned: ", e.target.responseText);
             var response = e.target.responseText;
-            document.getElementById("result").innerText = "SCORE :: " + response;
+            document.getElementById("result").innerText = "SCORE :: " + response + " / 1";
             /* if (action === 'register') {
 					document.getElementById("result").innerText = 'Hey ' + username + ', You have been registered!';
 				} else {
