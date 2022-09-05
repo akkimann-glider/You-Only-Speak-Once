@@ -282,6 +282,7 @@ function createDownloadLinkRight(blob) {
 
 var submit = document.getElementById("submitButton");
 submit.addEventListener("click", function (event) {
+	document.getElementById("result").innerText = "Comparing...";
     var xhr = new XMLHttpRequest();
     xhr.onload = function (e) {
         if (this.readyState === 4) {
