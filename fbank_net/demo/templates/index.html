@@ -1,28 +1,39 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>YOSO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="../static/style.css">
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>You Only Speak Once</h1>
     <p></p>
     <h4>How to use this demo?</h4>
 
     <br>
     <br>
-    
+
     <div>
+        <input type="radio" id="record" name="mode" value="record" checked>
+        <label for="record">Record</label>
+
+
+        <input type="radio" id="upload" name="mode" value="upload" style="    margin-left: 20px;">
+        <label for="upload">Upload</label>
+    </div>
+
+    <div id="voiceRecord" style="margin-top: 20px;">
         <div>
-          <h2>Voiceprint-1</h2>
+            <h2>Voiceprint-1</h2>
         </div>
 
         <div id="controlsLeft">
-          <button id="recordButtonLeft">Record</button>
-          <button id="pauseButtonLeft" disabled>Pause</button>
-          <button id="stopButtonLeft" disabled>Stop</button>
+            <button id="recordButtonLeft">Record</button>
+            <button id="pauseButtonLeft" disabled>Pause</button>
+            <button id="stopButtonLeft" disabled>Stop</button>
         </div>
 
         <br>
@@ -31,25 +42,50 @@
         <br>
 
         <div>
-          <h2>Voiceprint-2</h2>
+            <h2>Voiceprint-2</h2>
         </div>
 
         <div id="controlsRight">
-          <button id="recordButtonRight">Record</button>
-          <button id="pauseButtonRight" disabled>Pause</button>
-          <button id="stopButtonRight" disabled>Stop</button>
+            <button id="recordButtonRight">Record</button>
+            <button id="pauseButtonRight" disabled>Pause</button>
+            <button id="stopButtonRight" disabled>Stop</button>
         </div>
     </div>
-  
-    
+
+    <div id="fileUpload" style="margin-top: 20px;" hidden>
+        <div>
+            <h2>Voiceprint-1</h2>
+        </div>
+
+        <div id="controlsLeft">
+
+            <input type="file" id="fileLeft" name="file" accept=".wav">
+        </div>
+
+        <br>
+        <br>
+        <br>
+        <br>
+
+        <div>
+            <h2>Voiceprint-2</h2>
+        </div>
+
+        <div id="controlsRight">
+            <input type="file" id="fileRigth" name="file" accept=".wav">
+        </div>
+
+
+    </div>
+
     <div id="formats">Format: start recording to see sample rate</div>
-  	<h3>Recordings</h3>
-  	<ol id="recordingsList"></ol>
+    <h3>Recordings</h3>
+    <ol id="recordingsList"></ol>
 
     <button type="button" id="submitButton" value="Submit">Submit</button>
 
     <p>
-      <h2 id="result"></h2>
+        <h2 id="result"></h2>
     </p>
 
     <h3>Read this!</h3>
@@ -57,7 +93,7 @@
 
 
     <p>
-      <small>Demo Uses Matt Diamond's <a href="https://github.com/mattdiamond/Recorderjs">Recorder.js</a>,
+        <small>Demo Uses Matt Diamond's <a href="https://github.com/mattdiamond/Recorderjs">Recorder.js</a>,
         a popular JavaScript library for recording audio in the browser as uncompressed pcm audio in .wav
         containers.
 
@@ -67,11 +103,12 @@
     </p>
 
     <!-- inserting these scripts at the end to be able to use all the elements in the DOM -->
-  	<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-  	<script src="../static/js/app.js"></script>
+    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+    <script src="../static/js/app.js"></script>
     <script type="text/javascript">
         loadWikiArticle()
     </script>
 
-  </body>
+</body>
+
 </html>

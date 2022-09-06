@@ -45,8 +45,10 @@ function startRecordingLeft() {
 
     navigator.mediaDevices
         .getUserMedia(constraints)
-        .then(function (stream) {
-            console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        .then(function(stream) {
+            console.log(
+                "getUserMedia() success, stream created, initializing Recorder.js ..."
+            );
 
             /*
 			create an audio context after getUserMedia is called
@@ -77,7 +79,7 @@ function startRecordingLeft() {
 
             console.log("Recording started");
         })
-        .catch(function (err) {
+        .catch(function(err) {
             //enable the record button if getUserMedia() fails
             recordButton.disabled = false;
             stopButton.disabled = true;
@@ -120,48 +122,18 @@ function stopRecordingLeft() {
 }
 
 function createDownloadLinkLeft(blob) {
-    // var url = URL.createObjectURL(blob);
-    // var au = document.createElement('audio');
-    // var li = document.createElement('li');
-    // var link = document.createElement('a');
-
-    //name of .wav file to use during upload and download (without extendion)
     filenameLeft = "Left" + new Date().toISOString();
     blobLeft = blob;
-    //add controls to the <audio> element
-    // au.controls = true;
-    // au.src = url;
-
-    //save to disk link
-    // link.href = url;
-    // link.download = filename+".wav"; //download forces the browser to donwload the file using the  filename
-    // link.innerHTML = "Save to disk";
-
-    //add the new audio element to li
-    // li.appendChild(au);
-
-    //add the filename to the li
-    // li.appendChild(document.createTextNode(filename+".wav "))
-
-    //add the save to disk link to li
-    // li.appendChild(link);
-
-    //upload link
-    // var upload = document.createElement('a');
-    // upload.href="";
-    // upload.innerHTML = "Upload";
-
-    // li.appendChild(document.createTextNode (" "))//add a space in between
-    // li.appendChild(upload)//add the upload link to li
-
-    //add the li element to the ol
-    // recordingsList.appendChild(li);
 }
 
-var loadWikiArticle = function (e) {
+var loadWikiArticle = function(e) {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "https://en.wikipedia.org/api/rest_v1/page/random/summary", true);
-    xhr.onloadend = function (e) {
+    xhr.open(
+        "GET",
+        "https://en.wikipedia.org/api/rest_v1/page/random/summary",
+        true
+    );
+    xhr.onloadend = function(e) {
         var res = JSON.parse(e.target.responseText);
         document.getElementById("readingText").innerText = res["extract"];
     };
@@ -202,8 +174,10 @@ function startRecordingRight() {
 
     navigator.mediaDevices
         .getUserMedia(constraints)
-        .then(function (stream) {
-            console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        .then(function(stream) {
+            console.log(
+                "getUserMedia() success, stream created, initializing Recorder.js ..."
+            );
 
             /*
 			create an audio context after getUserMedia is called
@@ -234,7 +208,7 @@ function startRecordingRight() {
 
             console.log("Recording started");
         })
-        .catch(function (err) {
+        .catch(function(err) {
             //enable the record button if getUserMedia() fails
             recordButtonRight.disabled = false;
             stopButtonRight.disabled = true;
@@ -275,20 +249,22 @@ function stopRecordingRight() {
     //create the wav blob and pass it on to createDownloadLink
     rec.exportWAV(createDownloadLinkRight);
 }
+
 function createDownloadLinkRight(blob) {
-    filenameRight = "Left" + new Date().toISOString();
+    filenameRight = "Right" + new Date().toISOString();
     blobRight = blob;
 }
 
 var submit = document.getElementById("submitButton");
-submit.addEventListener("click", function (event) {
-	document.getElementById("result").innerText = "Comparing...";
+submit.addEventListener("click", function(event) {
+    document.getElementById("result").innerText = "Comparing...";
     var xhr = new XMLHttpRequest();
-    xhr.onload = function (e) {
+    xhr.onload = function(e) {
         if (this.readyState === 4) {
             console.log("Server returned: ", e.target.responseText);
             var response = e.target.responseText;
-            document.getElementById("result").innerText = "SCORE :: " + response + " / 1";
+            document.getElementById("result").innerText =
+                "SCORE :: " + response + " / 1";
             /* if (action === 'register') {
 					document.getElementById("result").innerText = 'Hey ' + username + ', You have been registered!';
 				} else {
@@ -311,12 +287,79 @@ submit.addEventListener("click", function (event) {
     xhr.send(fd);
 });
 
-var actionSelect = document.getElementById("action");
+var textarea = document.querySelector("textarea");
+let inputLeft = document.getElementById("fileLeft");
+inputLeft.addEventListener("change", () => {
+    let file = inputLeft.files[0];
+    let reader = new FileReader();
 
-actionSelect.onchange = loadWikiArticle;
-document.getElementById("howTo").hidden = true;
+    reader.onload = function() {
+        console.log(reader.result);
+        var blob = dataURItoBlob(reader.result);
+        blobLeft = blob;
+    };
+    reader.readAsDataURL(file);
 
-document.getElementById("expandCollapse").onclick = function () {
-    let howToHidden = document.getElementById("howTo").hidden;
-    document.getElementById("howTo").hidden = !howToHidden;
-};
+    /* reader.addEventListener('load', readFile);
+      reader.readAsText(file); */
+    filenameLeft = "Left" + new Date().toISOString();
+});
+
+let inputRight = document.getElementById("fileRigth");
+inputRight.addEventListener("change", () => {
+    let file = inputRight.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function() {
+        console.log(reader.result);
+        var blob = dataURItoBlob(reader.result);
+        blobRight = blob;
+    };
+    reader.readAsDataURL(file);
+    //   reader.addEventListener("load", readFile);
+    //   reader.readAsText(file);
+    // blobRight = reader;
+    filenameRight = "Left" + new Date().toISOString();
+});
+
+function dataURItoBlob(dataURI) {
+    // convert base64 to raw binary data held in a string
+    // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+    var byteString = atob(dataURI.split(',')[1]);
+
+    // separate out the mime component
+    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+    // write the bytes of the string to an ArrayBuffer
+    var ab = new ArrayBuffer(byteString.length);
+
+    // create a view into the buffer
+    var ia = new Uint8Array(ab);
+
+    // set the bytes of the buffer to the correct values
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+
+    // write the ArrayBuffer to a blob, and you're done
+    var blob = new Blob([ab], { type: mimeString });
+    return blob;
+
+}
+
+// function readFile(event) {
+//     textarea.textContent = event.target.result;
+// }
+
+document
+    .getElementsByName("mode")[0]
+    .addEventListener("change", function(event) {
+        document.getElementById("fileUpload").hidden = true;
+        document.getElementById("voiceRecord").hidden = false;
+    });
+document
+    .getElementsByName("mode")[1]
+    .addEventListener("change", function(event) {
+        document.getElementById("fileUpload").hidden = false;
+        document.getElementById("voiceRecord").hidden = true;
+    });
