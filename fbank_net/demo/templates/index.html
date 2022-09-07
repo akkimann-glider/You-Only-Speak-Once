@@ -23,6 +23,10 @@
 
         <input type="radio" id="upload" name="mode" value="upload" style="    margin-left: 20px;">
         <label for="upload">Upload</label>
+
+
+        <input type="radio" id="both" name="mode" value="both" style="    margin-left: 20px;">
+        <label for="both">Both</label>
     </div>
 
     <div id="voiceRecord" style="margin-top: 20px;">
@@ -67,7 +71,6 @@
         </div>
 
         <div id="controlsLeft">
-
             <input type="file" id="fileLeft" name="file" accept=".wav">
         </div>
 
@@ -85,6 +88,37 @@
         </div>
 
 
+    </div>
+
+    <div id="bothRecordUpload" style="margin-top: 20px;" hidden>
+        <div>
+            <h2>Voiceprint-1</h2>
+        </div>
+
+        <div id="controlsLeft">
+            <input type="file" id="fileBoth" name="file" accept=".wav">
+        </div>
+
+        <br>
+        <br>
+
+        <br>
+        <br>
+
+        <div>
+            <h2>Voiceprint-2</h2>
+        </div>
+
+        <div id="controlsBoth">
+            <button id="recordButtonBoth">Record</button>
+            <button id="pauseButtonBoth" disabled>Pause</button>
+            <button id="stopButtonBoth" disabled>Stop</button>
+        </div>
+
+        <br>
+        <br>
+        <h3>Recordings of Voiceprint-2</h3>
+        <ol id="recordingsListBoth"></ol>
     </div>
 
     <div id="formats">Format: start recording to see sample rate</div>

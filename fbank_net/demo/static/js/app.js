@@ -411,10 +411,186 @@ document
     .addEventListener("change", function(event) {
         document.getElementById("fileUpload").hidden = true;
         document.getElementById("voiceRecord").hidden = false;
+        document.getElementById("bothRecordUpload").hidden = true;
     });
 document
     .getElementsByName("mode")[1]
     .addEventListener("change", function(event) {
         document.getElementById("fileUpload").hidden = false;
         document.getElementById("voiceRecord").hidden = true;
+        document.getElementById("bothRecordUpload").hidden = true;
     });
+
+
+document
+    .getElementsByName("mode")[2]
+    .addEventListener("change", function(event) {
+        document.getElementById("fileUpload").hidden = true;
+        document.getElementById("voiceRecord").hidden = true;
+        document.getElementById("bothRecordUpload").hidden = false;
+    });
+
+
+
+
+// Both
+
+var recordButtonBoth = document.getElementById("recordButtonBoth");
+var stopButtonBoth = document.getElementById("stopButtonBoth");
+var pauseButtonBoth = document.getElementById("pauseButtonBoth");
+
+//add events to those 2 buttons
+recordButtonBoth.addEventListener("click", startRecordingBoth);
+stopButtonBoth.addEventListener("click", stopRecordingBoth);
+pauseButtonBoth.addEventListener("click", pauseRecordingBoth);
+
+function startRecordingBoth() {
+    console.log("recordButton clicked");
+
+    /*
+		Simple constraints object, for more advanced audio features see
+		https://addpipe.com/blog/audio-constraints-getusermedia/
+	*/
+
+    var constraints = { audio: true, video: false };
+
+    /*
+    	Disable the record button until we get a success or fail from getUserMedia() 
+	*/
+
+    recordButtonBoth.disabled = true;
+    stopButtonBoth.disabled = false;
+    pauseButtonBoth.disabled = false;
+
+    /*
+    	We're using the standard promise based getUserMedia()
+    	https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+	*/
+
+    navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then(function(stream) {
+            console.log(
+                "getUserMedia() success, stream created, initializing Recorder.js ..."
+            );
+
+            /*
+			create an audio context after getUserMedia is called
+			sampleRate might change after getUserMedia is called, like it does on macOS when recording through AirPods
+			the sampleRate defaults to the one set in your OS for your playback device
+
+		*/
+            audioContext = new AudioContext();
+
+            //update the format
+            document.getElementById("formats").innerHTML =
+                "Format: 1 channel pcm @ " + audioContext.sampleRate / 1000 + "kHz";
+
+            /*  assign to gumStream for later use  */
+            gumStream = stream;
+
+            /* use the stream */
+            input = audioContext.createMediaStreamSource(stream);
+
+            /*
+			Create the Recorder object and configure to record mono sound (1 channel)
+			Recording 2 channels  will double the file size
+		*/
+            rec = new Recorder(input, { numChannels: 1 });
+
+            //start the recording process
+            rec.record();
+
+            console.log("Recording started");
+        })
+        .catch(function(err) {
+            //enable the record button if getUserMedia() fails
+            recordButtonBoth.disabled = false;
+            stopButtonBoth.disabled = true;
+            pauseButtonBoth.disabled = true;
+        });
+}
+
+function pauseRecordingBoth() {
+    console.log("pauseButton clicked rec.recording=", rec.recording);
+    if (rec.recording) {
+        //pause
+        rec.stop();
+        pauseButtonBoth.innerHTML = "Resume";
+    } else {
+        //resume
+        rec.record();
+        pauseButtonBoth.innerHTML = "Pause";
+    }
+}
+
+function stopRecordingBoth() {
+    console.log("stopButton clicked");
+
+    //disable the stop button, enable the record too allow for new recordings
+    stopButtonBoth.disabled = true;
+    recordButtonBoth.disabled = false;
+    pauseButtonBoth.disabled = true;
+
+    //reset button just in case the recording is stopped while paused
+    pauseButtonBoth.innerHTML = "Pause";
+
+    //tell the recorder to stop the recording
+    rec.stop();
+
+    //stop microphone access
+    gumStream.getAudioTracks()[0].stop();
+
+    //create the wav blob and pass it on to createDownloadLink
+    rec.exportWAV(createDownloadLinkBoth);
+}
+
+function createDownloadLinkBoth(blob) {
+    filenameBoth = "Both" + new Date().toISOString();
+    blobRight = blob;
+
+
+    var url = URL.createObjectURL(blob);
+    var au = document.createElement('audio');
+    var li = document.createElement('li');
+    var link = document.createElement('a');
+
+    //add controls to the <audio> element
+    au.controls = true;
+    au.src = url;
+
+    //save to disk link
+    link.href = url;
+    link.download = filenameBoth + ".wav"; //download forces the browser to donwload the file using the  filename
+    link.innerHTML = "Save to disk";
+
+    //add the new audio element to li
+    li.appendChild(au);
+
+    //add the filename to the li
+    li.appendChild(document.createTextNode(filenameBoth + ".wav "))
+
+    //add the save to disk link to li
+    li.appendChild(link);
+
+    //add the li element to the ol
+    recordingsListBoth.appendChild(li);
+}
+
+
+let inputBoth = document.getElementById("fileBoth");
+inputBoth.addEventListener("change", () => {
+    let file = inputBoth.files[0];
+    let reader = new FileReader();
+
+    reader.onload = function() {
+        console.log(reader.result);
+        var blob = dataURItoBlob(reader.result);
+        blobLeft = blob;
+    };
+    reader.readAsDataURL(file);
+
+    /* reader.addEventListener('load', readFile);
+      reader.readAsText(file); */
+    filenameLeft = "Left" + new Date().toISOString();
+});
